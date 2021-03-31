@@ -1,6 +1,7 @@
 package com.jessica.auth.filter;
 
 import com.jessica.jwt.JwtClaim;
+import com.jessica.jwt.JwtKeyHelper;
 import com.jessica.jwt.JwtUtils;
 import com.jessica.user.context.UserContext;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,9 @@ public class JwtAuthorizationFilter implements Filter {
 	@Autowired
 	private UserContext userContext;
 
+	@Autowired
+	private JwtKeyHelper jwtKeyHelper;
+
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
 		// Change the req and res to HttpServletRequest and HttpServletResponse
@@ -34,6 +38,9 @@ public class JwtAuthorizationFilter implements Filter {
 			// Get authorization from Http request
 			String authHeader = httpServletRequest.getHeader("Authorization");
 			String publicKeyStr = env.getProperty("publicKey");
+			if (publicKeyStr == null) {
+				publicKeyStr = jwtKeyHelper.getPublicKey();
+			}
 			try {
 				JwtClaim jwtClaim = JwtUtils.parseToken(authHeader, publicKeyStr);
 				userContext.reset(jwtClaim.getUserName());
