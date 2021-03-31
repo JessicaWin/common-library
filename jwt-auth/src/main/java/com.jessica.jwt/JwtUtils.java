@@ -1,5 +1,6 @@
 package com.jessica.jwt;
 
+import com.google.gson.Gson;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
@@ -42,6 +43,8 @@ public class JwtUtils {
                 .setSigningKey(RSAUtil.getPublicKey(publicKey))
                 .parseClaimsJws(payload)
                 .getBody();
-        return claims.get(JWT_CLAIM, JwtClaim.class);
+        Object claimMap = claims.get(JWT_CLAIM);
+        Gson gson = new Gson();
+        return gson.fromJson(gson.toJson(claimMap), JwtClaim.class);
     }
 }
